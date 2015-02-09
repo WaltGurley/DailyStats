@@ -13,8 +13,14 @@ svg {
   fill: #fff;
 }
 
-.day {
+.month {
+  fill: none;
   stroke: #000;
+  stroke-width: 2px;
+}
+
+.day {
+  stroke: #333;
 }
 
 .year-title {
@@ -30,7 +36,7 @@ svg {
 .Reds .q6-9{fill:rgb(203,24,29)}
 .Reds .q7-9{fill:rgb(165,15,21)}
 .Reds .q8-9{fill:rgb(103,0,13)}
-.Reds .q9-9{fill:#000}
+.Reds .q9-9{fill:#9d9db5}
 
 #legend {
   margin-top: 10px;
