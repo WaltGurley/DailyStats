@@ -15,7 +15,7 @@ var year = d3.time.format("%Y"),
 
 
 //Load data from csv and set everything up
-var dataSource = window.location.href.slice(window.location.href.lastIndexOf("/"),window.location.href.indexOf(".html"));
+var dataSource = window.location.href.slice(window.location.href.lastIndexOf("/") + 1,window.location.href.indexOf(".html"));
 
 if (dataSource === "") {dataSource = "VisWorld";}
 
