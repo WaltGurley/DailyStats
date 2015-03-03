@@ -99,16 +99,16 @@ d3.csv("Data/" + dataSource + ".csv", function(error, csv) {
 
   //Create and arrange y-axis text
   d3.selectAll("svg")
-  .append("g")
-  .attr("class", "axis").selectAll("y")
-  .data(weekday)
-  .enter().append("text")
-  .text(function(d) { return  d; })
-  .attr({
-    "x": 5,
-    "y": function(d,i) { return ((height - cellSize * 7) / 2  + paddingTop) + i * cellSize + cellSize/2; },
-    "alignment-baseline": "middle"
-  });
+    .append("g")
+    .attr("class", "axis").selectAll("y")
+    .data(weekday)
+    .enter().append("text")
+    .text(function(d) { return  d; })
+    .attr({
+      "x": 5,
+      "y": function(d,i) { return ((height - cellSize * 7) / 2  + paddingTop) + i * cellSize + cellSize/2; },
+      "alignment-baseline": "middle"
+    });
 
   //Create and arrange title for visualizations
   function yearFilter(y) {
@@ -116,17 +116,17 @@ d3.csv("Data/" + dataSource + ".csv", function(error, csv) {
   }
 
   d3.selectAll("svg").selectAll(".year-title")
-  .data(function(d) { return d3.time.years(new Date(d, 0, 1), new Date(d + 1, 0, 1)); })
-  .enter().append("text")
-  .text(function(d) { return year(d) + " (Total Visitors: " +
-  d3.format(",")(d3.sum(yearFilter(year(d)), function(d) { return d[0].Visitors; })) + ")";
-  })
-  .attr({
-    "class": "year-title",
-    "x": width / 2,
-    "y": paddingTop,
-    "text-anchor": "middle"
-  });
+    .data(function(d) { return d3.time.years(new Date(d, 0, 1), new Date(d + 1, 0, 1)); })
+    .enter().append("text")
+    .text(function(d) { return year(d) + " (Total Visitors: " +
+    d3.format(",")(d3.sum(yearFilter(year(d)), function(d) { return d[0].Visitors; })) + ")";
+    })
+    .attr({
+      "class": "year-title",
+      "x": width / 2,
+      "y": paddingTop,
+      "text-anchor": "middle"
+    });
 
   //Create legend
   var legend = d3.select("#legend")
