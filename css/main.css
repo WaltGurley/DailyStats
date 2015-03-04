@@ -27,6 +27,14 @@ svg {
   font-size: 1.5em;
 }
 
+.month-label {
+  cursor: default;
+}
+
+.weekday-label {
+  cursor: default;
+}
+
 .Reds .q0-9{fill:rgb(255,245,240)}
 .Reds .q1-9{fill:rgb(254,224,210)}
 .Reds .q2-9{fill:rgb(252,187,161)}
@@ -43,9 +51,9 @@ svg {
 }
 
 #tooltip {
-  background-color: rgba(256, 256, 256, 0.8);
-  padding: 5px;
+  background-color: rgba(256, 256, 256, 0.9);
+  padding: 8px;
   border: 2px solid #666;
   border-radius: 5px;
-  max-width: 150px;
+  max-width: 300px;
 }

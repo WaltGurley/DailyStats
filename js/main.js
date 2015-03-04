@@ -8,6 +8,7 @@ var data,
   weekday = ["Sun", "Mon", "Tues", "Wed", "Thurs", "Fri", "Sat"];
 
 var year = d3.time.format("%Y"),
+  month = d3.time.format("%b"),
   week = d3.time.format("%U"),
   dayOfWeek = d3.time.format("%w"),
   format = d3.time.format("%-m/%-d/%Y");
@@ -92,6 +93,7 @@ d3.csv("Data/" + dataSource + ".csv", function(error, csv) {
     .enter().append("text")
     .text(function(d) { return  monthAbr(d3.select(d).datum()); })
     .attr({
+      "class": "month-label",
       "x": function(d) { return d.getBBox().x + d.getBBox().width / 2; },
       "y": -10,
       "text-anchor": "middle"
@@ -105,6 +107,7 @@ d3.csv("Data/" + dataSource + ".csv", function(error, csv) {
     .enter().append("text")
     .text(function(d) { return  d; })
     .attr({
+      "class": "weekday-label",
       "x": 5,
       "y": function(d,i) { return ((height - cellSize * 7) / 2  + paddingTop) + i * cellSize + cellSize/2; },
       "alignment-baseline": "middle"
@@ -136,6 +139,7 @@ d3.csv("Data/" + dataSource + ".csv", function(error, csv) {
       "width": width,
       "height": 100
     });
+  var center = parseInt(d3.select("#legend").style("width")) / 2;
 
   legend.selectAll("key")
     .data(color.range())
@@ -145,13 +149,15 @@ d3.csv("Data/" + dataSource + ".csv", function(error, csv) {
       "stroke": "#000",
       "width": cellSize,
       "height": cellSize,
-      "x": function(d, i) { return cellSize * (i + 1); },
+      "x": function(d, i) {
+        return cellSize * i + center - color.range().length * cellSize / 2;
+      },
       "y": (100 - cellSize) / 2
     });
 
   legend.append("text")
     .attr({
-      "x": cellSize * 10 / 2,
+      "x": center,
       "y": (100 - cellSize) / 2 - cellSize / 4,
       "text-anchor": "middle"
     })
@@ -159,7 +165,7 @@ d3.csv("Data/" + dataSource + ".csv", function(error, csv) {
 
   legend.append("text")
     .attr({
-      "x": cellSize * 2,
+      "x": center - cellSize * 3,
       "y": (100 - cellSize) / 2 + cellSize * 3/2 + 5,
       "text-anchor": "end"
     })
@@ -167,7 +173,7 @@ d3.csv("Data/" + dataSource + ".csv", function(error, csv) {
 
   legend.append("text")
     .attr({
-      "x": cellSize * 8,
+      "x": center + cellSize * 3,
       "y": (100 - cellSize) / 2 + cellSize * 3/2 + 5,
       "text-anchor": "start"
     })
@@ -188,7 +194,7 @@ function monthPath(t0) {
     "H" + (w0 + 1) * cellSize + "Z";
 }
 
-//Create tooltip
+//Create tooltips
 function MakeToolTip() {
   var tooltip = d3.select("body")
     .append("div")
@@ -205,7 +211,9 @@ function MakeToolTip() {
       "<p class='text-center'><strong>" + data[d][0].Date + "</strong></p>" +
       "<p><strong>Visitors: </strong>" + data[d][0].Visitors + "</p>" +
       "<p><strong>Hours open: </strong>" + data[d][0].Hours + "</p>" +
-      "<p><strong>Visitors/Hour: </strong>" + Math.round(data[d][0].Visitors / data[d][0].Hours * 10) / 10 + "</p>"
+      "<p><strong>Visitors/Hour: </strong>" +
+        Math.round(data[d][0].Visitors / data[d][0].Hours * 10) / 10 +
+        "</p>"
       :
       "<p class='text-center'><strong>" + data[d][0].Date + "</strong></p>" +
       "<p class='text-center'><strong>Closed</strong></p>" +
@@ -217,8 +225,95 @@ function MakeToolTip() {
     });
   });
 
+  //Fire tooltop on mouse over day of week label
+  d3.selectAll(".weekday-label").on("mouseover", function () {
+    var curYear = d3.select(this.parentNode).datum(),
+      curDay = d3.select(this).text();
+
+    var weekdayYear = d3.values(data).filter(function(d) {
+        return dayOfWeek(new Date(d[0].Date)) === weekday.indexOf(curDay).toString() &&
+          year(new Date(d[0].Date)) === curYear.toString();
+      }),
+      numVis = d3.sum(weekdayYear, function(d) { return d[0].Visitors; }),
+      numHours = d3.sum(weekdayYear, function(d) { return d[0].Hours; });
+
+
+    tooltip.style("visibility", "visible");
+    tooltip.html(
+      "<p class='text-center'><strong>" +
+        curDay + " in " + curYear + " (" + weekdayYear.length + ")" +
+      "</strong></p>" +
+      "<p><strong>Total Visitors: </strong>" +
+        numVis +
+      "</p>" +
+      "<p><strong>Total Hours open: </strong>" +
+        numHours +
+      "</p>" +
+      "<p><strong>Visitors/Hour: </strong>" +
+        Math.round(numVis / numHours * 10) / 10 +
+      "</p>" +
+      "<p><strong>Total Days Closed: </strong>" +
+        weekdayYear.filter(function(d) { return d[0].Hours === "0"; }).length +
+      "</p>"
+    )
+    .style({
+      "left": window.innerWidth - d3.event.pageX < 150 ?
+        d3.event.pageX - 150 + "px" :
+        d3.event.pageX + 25 + "px",
+      "top": window.innerHeight - d3.event.pageY > 150 ?
+        (d3.event.pageY) + "px" :
+        (d3.event.pageY - 150) + "px"
+    });
+  });
+
+  //Fire tooltop on mouse over month label
+  d3.selectAll(".month-label").on("mouseover", function () {
+    var curYear = d3.select(this.parentNode).datum(),
+      curMonth = d3.select(this).text();
+
+    var monthYear = d3.values(data).filter(function(d) {
+        return month(new Date(d[0].Date)) === curMonth &&
+          year(new Date(d[0].Date)) === curYear.toString();
+      }),
+      numVis = d3.sum(monthYear, function(d) { return d[0].Visitors; }),
+      numHours = d3.sum(monthYear, function(d) { return d[0].Hours; });
+
+    tooltip.style("visibility", "visible");
+    tooltip.html(
+      "<p class='text-center'><strong>" +
+      curMonth + ", " + curYear +
+      "</strong></p>" +
+      "<p><strong>Total Visitors: </strong>" +
+        numVis +
+      "</p>" +
+      "<p><strong>Total Hours open: </strong>" +
+        numHours +
+      "</p>" +
+      "<p><strong>Visitors/Hour: </strong>" +
+        Math.round(numVis / numHours * 10) / 10 +
+      "</p>" +
+      "<p><strong>Total Days Closed: </strong>" +
+        monthYear.filter(function(d) { return d[0].Hours === "0"; }).length +
+      "</p>"
+    )
+    .style({
+      "left": window.innerWidth - d3.event.pageX < 150 ?
+        d3.event.pageX - 150 + "px" :
+        d3.event.pageX + 25 + "px",
+      "top": window.innerHeight - d3.event.pageY > 150 ?
+        (d3.event.pageY) + "px" :
+        (d3.event.pageY - 150) + "px"
+    });
+  });
+
   //Remove tooltip on mouse out
   d3.selectAll(".day").on("mouseout", function () {
+    tooltip.style("visibility", "hidden");
+  });
+  d3.selectAll(".weekday-label").on("mouseout", function () {
+    tooltip.style("visibility", "hidden");
+  });
+  d3.selectAll(".month-label").on("mouseout", function () {
     tooltip.style("visibility", "hidden");
   });
 }
