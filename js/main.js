@@ -32,36 +32,36 @@ d3.csv("Data/" + dataSource + ".csv", function(error, csv) {
     endDate = new Date(d3.keys(data)[d3.keys(data).length-1]);
     endDate.setDate(endDate.getDate() + 1);
   var visSvg = d3.select("#visContainer").selectAll("svg")
-  .data(years)
-  .enter().append("svg")
-  .attr({
-    "class": "Reds",
-    "width": width,
-    "height": height,
-  })
-  .append("g")
-  .attr("transform", "translate(" + ((width - cellSize * 53) / 2) + "," + ((height - cellSize * 7) / 2 + paddingTop) + ")");
+    .data(years)
+    .enter().append("svg")
+    .attr({
+      "class": "Reds",
+      "width": width,
+      "height": height,
+    })
+    .append("g")
+    .attr("transform", "translate(" + ((width - cellSize * 53) / 2) + "," + ((height - cellSize * 7) / 2 + paddingTop) + ")");
 
   //Create and position day cells in columns by week and row by day
   var rectDay = visSvg.selectAll(".day")
-  .data(function(d, i) {
-    if (d === startYear) {
-      return d3.time.days(new Date(d3.keys(data)[0]), new Date(d + 1, 0, 1));
-    } else if (d === endYear) {
-      return d3.time.days(new Date(d, 0, 1), new Date(endDate));
-    } else {
-      return d3.time.days(new Date(d, 0, 1), new Date(d + 1, 0, 1));
-    }
-  })
-  .enter().append("rect")
-  .attr({
-    "class": "day",
-    "width": cellSize,
-    "height": cellSize,
-    "x": function(d) { return week(d) * cellSize; },
-    "y": function(d) { return dayOfWeek(d) * cellSize; }
-  })
-  .datum(format);
+    .data(function(d, i) {
+      if (d === startYear) {
+        return d3.time.days(new Date(d3.keys(data)[0]), new Date(d + 1, 0, 1));
+      } else if (d === endYear) {
+        return d3.time.days(new Date(d, 0, 1), new Date(endDate));
+      } else {
+        return d3.time.days(new Date(d, 0, 1), new Date(d + 1, 0, 1));
+      }
+    })
+    .enter().append("rect")
+    .attr({
+      "class": "day",
+      "width": cellSize,
+      "height": cellSize,
+      "x": function(d) { return week(d) * cellSize; },
+      "y": function(d) { return dayOfWeek(d) * cellSize; }
+    })
+    .datum(format);
 
   //Create color scale
   var color = d3.scale.quantize()
@@ -213,7 +213,8 @@ function MakeToolTip() {
       "<p><strong>Hours open: </strong>" + data[d][0].Hours + "</p>" +
       "<p><strong>Visitors/Hour: </strong>" +
         Math.round(data[d][0].Visitors / data[d][0].Hours * 10) / 10 +
-        "</p>"
+        "</p>" +
+      "<p class='text-center'><strong>" + data[d][0].Notes + "</strong></p>"
       :
       "<p class='text-center'><strong>" + data[d][0].Date + "</strong></p>" +
       "<p class='text-center'><strong>Closed</strong></p>" +
@@ -225,7 +226,7 @@ function MakeToolTip() {
     });
   });
 
-  //Fire tooltop on mouse over day of week label
+  //Fire tooltip on mouse over day of week label
   d3.selectAll(".weekday-label").on("mouseover", function () {
     var curYear = d3.select(this.parentNode).datum(),
       curDay = d3.select(this).text();
@@ -266,7 +267,7 @@ function MakeToolTip() {
     });
   });
 
-  //Fire tooltop on mouse over month label
+  //Fire tooltip on mouse over month label
   d3.selectAll(".month-label").on("mouseover", function () {
     var curYear = d3.select(this.parentNode).datum(),
       curMonth = d3.select(this).text();
