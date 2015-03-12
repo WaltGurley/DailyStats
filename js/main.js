@@ -37,7 +37,7 @@ d3.csv("Data/" + dataSource + ".csv", function(error, csv) {
     .attr({
       "class": "Reds",
       "width": width,
-      "height": height,
+      "height": height
     })
     .append("g")
     .attr("transform", "translate(" + ((width - cellSize * 53) / 2) + "," + ((height - cellSize * 7) / 2 + paddingTop) + ")");
