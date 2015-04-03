@@ -13,17 +13,29 @@ var year = d3.time.format("%Y"),
   dayOfWeek = d3.time.format("%w"),
   format = d3.time.format("%-m/%-d/%Y");
 
+//Use tabletop.js to load from Google Spreadsheet
+var spreadsheetUrl = "https://docs.google.com/spreadsheets/d/1vKxiHrWznMutTVxHuZ9u6Pn1UdN4TlC1jHSsYh-W4-8/pubhtml?gid=0&single=true";
+$(document).ready(init);
 
+function init() {
+  Tabletop.init({
+    key: spreadsheetUrl,
+    callback: setupEverything,
+    simpleSheet: false
+  });
+}
 
-//Load data from csv and set everything up
+//Get correct data using name from page url
 var dataSource = window.location.href.slice(window.location.href.lastIndexOf("/") + 1,window.location.href.indexOf(".html"));
 
-if (dataSource === "") {dataSource = "VisWorld";}
+if (dataSource === "") { dataSource = "VisWorld"; }
 
-d3.csv("Data/" + dataSource + ".csv", function(error, csv) {
+function setupEverything(spreadsheetData) {
+
   data = d3.nest()
     .key(function(d) { return d.Date; })
-    .map(csv);
+    .map(spreadsheetData[dataSource].elements
+      .filter(function(d) { return d["Visitors/Hr"] !== ""; }));
 
   //Set up svg's with years for datasets
   var startYear = parseInt(year(new Date(d3.keys(data)[0]))),
@@ -44,7 +56,7 @@ d3.csv("Data/" + dataSource + ".csv", function(error, csv) {
 
   //Create and position day cells in columns by week and row by day
   var rectDay = visSvg.selectAll(".day")
-    .data(function(d, i) {
+    .data(function(d) {
       if (d === startYear) {
         return d3.time.days(new Date(d3.keys(data)[0]), new Date(d + 1, 0, 1));
       } else if (d === endYear) {
@@ -87,6 +99,7 @@ d3.csv("Data/" + dataSource + ".csv", function(error, csv) {
     .attr("class", "month")
     .attr("d", monthPath);
 
+  //Add labels for months
   var monthAbr = d3.time.format("%b");
   visSvg.selectAll(".month-label")
     .data(function(d, i) { return monthBorder[i]; })
@@ -180,7 +193,7 @@ d3.csv("Data/" + dataSource + ".csv", function(error, csv) {
     .text("> " + color.invertExtent("q7-9")[0]);
 
   MakeToolTip();
-});
+};
 
 //Create paths for months (from: http://bl.ocks.org/mbostock/4063318)
 function monthPath(t0) {
