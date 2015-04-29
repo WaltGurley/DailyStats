@@ -13,9 +13,42 @@ var year = d3.time.format("%Y"),
   dayOfWeek = d3.time.format("%w"),
   format = d3.time.format("%-m/%-d/%Y");
 
+//Function to bring selected day square to front
+d3.selection.prototype.moveToFront = function() {
+  return this.each(function(){
+    this.parentNode.appendChild(this);
+  });
+};
+
+//Spinner test
+var opts = {
+  lines: 9, // The number of lines to draw
+  length: 8, // The length of each line
+  width: 5, // The line thickness
+  radius: 12, // The radius of the inner circle
+  corners: 0, // Corner roundness (0..1)
+  rotate: 0, // The rotation offset
+  direction: 1, // 1: clockwise, -1: counterclockwise
+  color: '#000', // #rgb or #rrggbb or array of colors
+  speed: 1.5, // Rounds per second
+  trail: 60, // Afterglow percentage
+  shadow: false, // Whether to render a shadow
+  hwaccel: false, // Whether to use hardware acceleration
+  className: 'spinner', // The CSS class to assign to the spinner
+  zIndex: 2e9, // The z-index (defaults to 2000000000)
+  top: '50%', // Top position relative to parent
+  left: '50%' // Left position relative to parent
+};
+var spinner;
+
 //Use tabletop.js to load from Google Spreadsheet
 var spreadsheetUrl = "https://docs.google.com/spreadsheets/d/1vKxiHrWznMutTVxHuZ9u6Pn1UdN4TlC1jHSsYh-W4-8/pubhtml?gid=0&single=true";
-$(document).ready(init);
+$(document).ready(function() {
+  var target = document.getElementById("main-content");
+  spinner = new Spinner(opts).spin(target);
+
+  init();
+});
 
 function init() {
   Tabletop.init({
@@ -193,7 +226,8 @@ function setupEverything(spreadsheetData) {
     .text("> " + color.invertExtent("q7-9")[0]);
 
   MakeToolTip();
-};
+  spinner.stop();
+}
 
 //Create paths for months (from: http://bl.ocks.org/mbostock/4063318)
 function monthPath(t0) {
@@ -219,6 +253,13 @@ function MakeToolTip() {
 
   //Fire tooltip on mouse hover over day cells
   d3.selectAll(".day").on("mouseover", function (d) {
+    var thisDayActive = d3.select(this);
+    if (!thisDayActive.classed("this-day-active")) {
+      thisDayActive
+        .classed("this-day-active", true)
+        .moveToFront();
+    }
+
     tooltip.style("visibility", "visible");
     tooltip.html(data[d][0].Hours !== "0" ?
       "<p class='text-center'><strong>" + data[d][0].Date + "</strong></p>" +
@@ -240,7 +281,7 @@ function MakeToolTip() {
   });
 
   //Fire tooltip on mouse over day of week label
-  d3.selectAll(".weekday-label").on("mouseover", function () {
+  d3.selectAll(".weekday-label").on("mouseenter", function () {
     var curYear = d3.select(this.parentNode).datum(),
       curDay = d3.select(this).text();
 
@@ -322,6 +363,8 @@ function MakeToolTip() {
 
   //Remove tooltip on mouse out
   d3.selectAll(".day").on("mouseout", function () {
+    d3.selectAll(".day").classed("this-day-active", false);
+    d3.selectAll(".month").moveToFront();
     tooltip.style("visibility", "hidden");
   });
   d3.selectAll(".weekday-label").on("mouseout", function () {

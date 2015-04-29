@@ -1,3 +1,7 @@
+body {
+  font-family: 'Roboto', sans-serif;
+}
+
 svg {
   width: 100%;
   margin: auto;
@@ -31,8 +35,15 @@ svg {
   cursor: default;
 }
 
+.month-label:hover {
+  font-weight: bold;
+}
 .weekday-label {
   cursor: default;
+}
+
+.weekday-label:hover {
+  font-weight: bold;
 }
 
 .Reds .q0-9{fill:rgb(255,245,240)}
@@ -50,10 +61,16 @@ svg {
   margin-top: 10px;
 }
 
+.this-day-active {
+  stroke: #00ff6a;
+  stroke-width: 3px;
+}
+
 #tooltip {
   background-color: rgba(256, 256, 256, 0.9);
   padding: 8px;
-  border: 2px solid #666;
-  border-radius: 5px;
+  border: 1px solid #666;
+  /*border-radius: 5px;*/
+  box-shadow: 3px 3px 1px rgba(0, 0, 0, 0.5);
   max-width: 300px;
 }
