@@ -68,7 +68,7 @@ function setupEverything(spreadsheetData) {
   data = d3.nest()
     .key(function(d) { return d.Date; })
     .map(spreadsheetData[dataSource].elements
-      .filter(function(d) { return d["Visitors/Hr"] !== ""; }));
+      .filter(function(d) { return d.Hours !== ""; }));
 
   //Set up svg's with years for datasets
   var startYear = parseInt(year(new Date(d3.keys(data)[0]))),
